@@ -1,0 +1,8 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="mt-5">
+    <h2>Welcome, Tenant {{ user.name }}</h2>
+    <p>View your profile, lease details, and submit maintenance requests.</p>
+    <a href="{% url 'logout' %}" class="btn btn-secondary">Logout</a>
+</div>
+{% endblock %}
