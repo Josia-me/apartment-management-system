@@ -17,3 +17,16 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.name
+
+class Building(models.Model):
+    TYPE_CHOICES = (
+        ('apartment', 'Apartment'),
+        ('house', 'House'),
+    )
+    name = models.CharField(max_length=255)
+    location = models.CharField(max_length=255)
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name

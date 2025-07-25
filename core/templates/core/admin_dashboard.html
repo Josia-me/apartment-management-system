@@ -3,6 +3,7 @@
 <div class="mt-5">
     <h2>Welcome, Admin {{ user.name }}</h2>
     <p>Manage buildings, units, tenants, and more.</p>
+    <a href="{% url 'building_list' %}" class="btn btn-primary">Manage Buildings</a>
     <a href="{% url 'logout' %}" class="btn btn-secondary">Logout</a>
 </div>
 {% endblock %}

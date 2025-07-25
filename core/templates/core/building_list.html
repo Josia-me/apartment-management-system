@@ -1,0 +1,37 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="mt-5">
+    <h2>Manage Buildings</h2>
+    <a href="{% url 'building_create' %}" class="btn btn-primary mb-3">Add New Building</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for building in buildings %}
+            <tr>
+                <td>{{ building.name }}</td>
+                <td>{{ building.location }}</td>
+                <td>{{ building.get_type_display }}</td>
+                <td>{{ building.description }}</td>
+                <td>
+                    <a href="{% url 'building_update' building.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'building_delete' building.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No buildings found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+{% endblock %}
