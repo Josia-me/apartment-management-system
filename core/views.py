@@ -5,8 +5,8 @@ from django.http import HttpResponseForbidden
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
-from .models import Building
-from .forms import BuildingForm
+from .models import Building, Unit
+from .forms import BuildingForm, UnitForm
 
 def login_view(request):
     if request.method == 'POST':
@@ -103,4 +103,67 @@ class BuildingDeleteView(DeleteView):
         name = self.object.name
         response = super().post(request, *args, **kwargs)
         messages.success(self.request, f"Building '{name}' deleted successfully.")
+        return response
+
+class UnitListView(ListView):
+    model = Unit
+    template_name = 'core/unit_list.html'
+    context_object_name = 'units'
+
+    def get(self, request, *args, **kwargs):
+        if request.user.role != 'admin':
+            messages.error(request, "Access denied: You are not authorized to view this page.")
+            return HttpResponseForbidden("Access denied")
+        return super().get(request, *args, **kwargs)
+
+class UnitCreateView(CreateView):
+    model = Unit
+    form_class = UnitForm
+    template_name = 'core/unit_form.html'
+    success_url = reverse_lazy('unit_list')
+
+    def get(self, request, *args, **kwargs):
+        if request.user.role != 'admin':
+            messages.error(request, "Access denied: You are not authorized to view this page.")
+            return HttpResponseForbidden("Access denied")
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, f"Unit '{form.instance.unit_number}' created successfully.")
+        return response
+
+class UnitUpdateView(UpdateView):
+    model = Unit
+    form_class = UnitForm
+    template_name = 'core/unit_form.html'
+    success_url = reverse_lazy('unit_list')
+
+    def get(self, request, *args, **kwargs):
+        if request.user.role != 'admin':
+            messages.error(request, "Access denied: You are not authorized to view this page.")
+            return HttpResponseForbidden("Access denied")
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, f"Unit '{form.instance.unit_number}' updated successfully.")
+        return response
+
+class UnitDeleteView(DeleteView):
+    model = Unit
+    template_name = 'core/unit_confirm_delete.html'
+    success_url = reverse_lazy('unit_list')
+
+    def get(self, request, *args, **kwargs):
+        if request.user.role != 'admin':
+            messages.error(request, "Access denied: You are not authorized to view this page.")
+            return HttpResponseForbidden("Access denied")
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        unit_number = self.object.unit_number
+        response = super().post(request, *args, **kwargs)
+        messages.success(self.request, f"Unit '{unit_number}' deleted successfully.")
         return response

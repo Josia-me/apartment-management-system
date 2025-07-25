@@ -1,0 +1,12 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="mt-5">
+    <h2>Delete Unit</h2>
+    <p>Are you sure you want to delete "{{ object.unit_number }}" in "{{ object.building.name }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Confirm Delete</button>
+        <a href="{% url 'unit_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

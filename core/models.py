@@ -30,3 +30,23 @@ class Building(models.Model):
 
     def __str__(self):
         return self.name
+
+class Unit(models.Model):
+    TYPE_CHOICES = (
+        ('studio', 'Studio'),
+        ('1-bedroom', '1-Bedroom'),
+        ('2-bedroom', '2-Bedroom'),
+        ('3-bedroom', '3-Bedroom'),
+    )
+    STATUS_CHOICES = (
+        ('vacant', 'Vacant'),
+        ('occupied', 'Occupied'),
+    )
+    building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='units')
+    unit_number = models.CharField(max_length=50, unique=True)
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    rent_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='vacant')
+
+    def __str__(self):
+        return f"{self.unit_number} - {self.building.name}"
