@@ -50,3 +50,19 @@ class Unit(models.Model):
 
     def __str__(self):
         return f"{self.unit_number} - {self.building.name}"
+
+class Tenant(models.Model):
+    STATUS_CHOICES = (
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+    )
+    name = models.CharField(max_length=255)
+    phone = models.CharField(max_length=20)
+    email = models.EmailField(unique=True)
+    id_number = models.CharField(max_length=50, unique=True)
+    profile_photo = models.ImageField(upload_to='tenant_photos/', blank=True, null=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
+    unit = models.ForeignKey(Unit, on_delete=models.SET_NULL, null=True, blank=True, related_name='tenants')
+
+    def __str__(self):
+        return self.name

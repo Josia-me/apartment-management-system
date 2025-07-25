@@ -1,5 +1,5 @@
 from django import forms
-from .models import Building, Unit
+from .models import Building, Unit, Tenant
 
 class BuildingForm(forms.ModelForm):
     class Meta:
@@ -16,4 +16,12 @@ class UnitForm(forms.ModelForm):
         widgets = {
             'building': forms.Select(),
             'rent_amount': forms.NumberInput(attrs={'step': '0.01'}),
+        }
+
+class TenantForm(forms.ModelForm):
+    class Meta:
+        model = Tenant
+        fields = ['name', 'phone', 'email', 'id_number', 'profile_photo', 'status', 'unit']
+        widgets = {
+            'unit': forms.Select(),
         }

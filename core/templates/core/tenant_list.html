@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="mt-5">
+    <h2>Manage Tenants</h2>
+    <a href="{% url 'tenant_create' %}" class="btn btn-primary mb-3">Add New Tenant</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>ID Number</th>
+                <th>Unit</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tenant in tenants %}
+            <tr>
+                <td>{{ tenant.name }}</td>
+                <td>{{ tenant.phone }}</td>
+                <td>{{ tenant.email }}</td>
+                <td>{{ tenant.id_number }}</td>
+                <td>{{ tenant.unit.unit_number|default:"Unassigned" }}</td>
+                <td>{{ tenant.get_status_display }}</td>
+                <td>
+                    <a href="{% url 'tenant_update' tenant.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'tenant_delete' tenant.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">No tenants found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+{% endblock %}
