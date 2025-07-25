@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.core.exceptions import ValidationError
 
 class CustomUser(AbstractUser):
     ROLE_CHOICES = (
@@ -66,3 +67,26 @@ class Tenant(models.Model):
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        if self.unit and self.unit.tenants.exclude(id=self.id).exists():
+            raise ValidationError(f"Unit '{self.unit.unit_number}' is already occupied by another tenant.")
+        super().clean()
+
+    def save(self, *args, **kwargs):
+        # Update unit status based on tenant assignment
+        self.clean()
+        super().save(*args, **kwargs)
+        if self.unit:
+            self.unit.status = 'occupied'
+            self.unit.save()
+        # If unit is unassigned, set previous unit to vacant
+        elif self.pk:
+            try:
+                old_tenant = Tenant.objects.get(pk=self.pk)
+                if old_tenant.unit:
+                    old_unit = old_tenant.unit
+                    old_unit.status = 'vacant'
+                    old_unit.save()
+            except Tenant.DoesNotExist:
+                pass

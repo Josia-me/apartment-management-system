@@ -27,6 +27,7 @@
                 <td>
                     <a href="{% url 'tenant_update' tenant.pk %}" class="btn btn-sm btn-warning">Edit</a>
                     <a href="{% url 'tenant_delete' tenant.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                    <a href="{% url 'tenant_assign' tenant.pk %}" class="btn btn-sm btn-info">Assign Unit</a>
                 </td>
             </tr>
             {% empty %}

@@ -1,0 +1,16 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="mt-5">
+    <h2>Assign Tenant: {{ object.name }}</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="id_unit" class="form-label">Unit</label>
+            {{ form.unit }}
+            <small class="form-text text-muted">Select a unit to assign or leave blank to unassign.</small>
+        </div>
+        <button type="submit" class="btn btn-primary">Assign</button>
+        <a href="{% url 'tenant_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

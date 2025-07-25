@@ -25,3 +25,11 @@ class TenantForm(forms.ModelForm):
         widgets = {
             'unit': forms.Select(),
         }
+
+class TenantAssignForm(forms.ModelForm):
+    class Meta:
+        model = Tenant
+        fields = ['unit']
+        widgets = {
+            'unit': forms.Select(),
+        }

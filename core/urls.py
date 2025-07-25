@@ -18,4 +18,5 @@ urlpatterns = [
     path('tenants/add/', views.TenantCreateView.as_view(), name='tenant_create'),
     path('tenants/<int:pk>/edit/', views.TenantUpdateView.as_view(), name='tenant_update'),
     path('tenants/<int:pk>/delete/', views.TenantDeleteView.as_view(), name='tenant_delete'),
+    path('tenants/<int:pk>/assign/', views.TenantAssignView.as_view(), name='tenant_assign'),
 ]

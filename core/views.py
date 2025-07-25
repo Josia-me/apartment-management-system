@@ -6,7 +6,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from .models import Building, Unit, Tenant
-from .forms import BuildingForm, UnitForm, TenantForm
+from .forms import BuildingForm, UnitForm, TenantForm, TenantAssignForm
 
 def login_view(request):
     if request.method == 'POST':
@@ -229,4 +229,22 @@ class TenantDeleteView(DeleteView):
         name = self.object.name
         response = super().post(request, *args, **kwargs)
         messages.success(self.request, f"Tenant '{name}' deleted successfully.")
+        return response
+
+class TenantAssignView(UpdateView):
+    model = Tenant
+    form_class = TenantAssignForm
+    template_name = 'core/tenant_assign.html'
+    success_url = reverse_lazy('tenant_list')
+
+    def get(self, request, *args, **kwargs):
+        if request.user.role != 'admin':
+            messages.error(request, "Access denied: You are not authorized to view this page.")
+            return HttpResponseForbidden("Access denied")
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        unit_display = form.instance.unit.unit_number if form.instance.unit else "unassigned"
+        messages.success(self.request, f"Tenant '{form.instance.name}' assigned to unit '{unit_display}' successfully.")
         return response
