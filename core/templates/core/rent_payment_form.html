@@ -1,0 +1,39 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="mt-5">
+    <h2>{% if form.instance.pk %}Edit{% else %}Add{% endif %} Rental Payment</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="id_tenant" class="form-label">Tenant</label>
+            {{ form.tenant }}
+        </div>
+        <div class="mb-3">
+            <label for="id_unit" class="form-label">Unit</label>
+            {{ form.unit }}
+        </div>
+        <div class="mb-3">
+            <label for="id_amount" class="form-label">Amount</label>
+            {{ form.amount }}
+        </div>
+        <div class="mb-3">
+            <label for="id_month" class="form-label">Month</label>
+            {{ form.month }}
+        </div>
+        <div class="mb-3">
+            <label for="id_year" class="form-label">Year</label>
+            {{ form.year }}
+        </div>
+        <div class="mb-3">
+            <label for="id_status" class="form-label">Status</label>
+            {{ form.status }}
+        </div>
+        <div class="mb-3">
+            <label for="id_payment_date" class="form-label">Payment Date</label>
+            {{ form.payment_date }}
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{% url 'rent_payment_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

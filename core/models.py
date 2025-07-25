@@ -74,13 +74,11 @@ class Tenant(models.Model):
         super().clean()
 
     def save(self, *args, **kwargs):
-        # Update unit status based on tenant assignment
         self.clean()
         super().save(*args, **kwargs)
         if self.unit:
             self.unit.status = 'occupied'
             self.unit.save()
-        # If unit is unassigned, set previous unit to vacant
         elif self.pk:
             try:
                 old_tenant = Tenant.objects.get(pk=self.pk)
@@ -90,3 +88,36 @@ class Tenant(models.Model):
                     old_unit.save()
             except Tenant.DoesNotExist:
                 pass
+
+class RentPayment(models.Model):
+    STATUS_CHOICES = (
+        ('paid', 'Paid'),
+        ('unpaid', 'Unpaid'),
+    )
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, related_name='payments')
+    unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name='payments')
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    month = models.IntegerField(choices=[(i, i) for i in range(1, 13)])
+    year = models.IntegerField()
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='unpaid')
+    payment_date = models.DateField(null=True, blank=True)
+    receipt_number = models.CharField(max_length=50, unique=True, blank=True)
+
+    def __str__(self):
+        return f"{self.tenant.name} - {self.month}/{self.year}"
+
+    def clean(self):
+        if self.tenant.unit != self.unit:
+            raise ValidationError("The tenant must be assigned to the selected unit.")
+        if self.payment_date and self.status == 'unpaid':
+            raise ValidationError("Payment date should be empty for unpaid status.")
+        if not self.payment_date and self.status == 'paid':
+            raise ValidationError("Payment date is required for paid status.")
+        super().clean()
+
+    def save(self, *args, **kwargs):
+        if not self.receipt_number and self.status == 'paid':
+            self.receipt_number = f"REC-{self.tenant.id}-{self.month}-{self.year}"
+        elif self.status == 'unpaid':
+            self.receipt_number = ''
+        super().save(*args, **kwargs)

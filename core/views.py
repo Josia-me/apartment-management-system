@@ -5,8 +5,8 @@ from django.http import HttpResponseForbidden
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
-from .models import Building, Unit, Tenant
-from .forms import BuildingForm, UnitForm, TenantForm, TenantAssignForm
+from .models import Building, Unit, Tenant, RentPayment
+from .forms import BuildingForm, UnitForm, TenantForm, TenantAssignForm, RentPaymentForm
 
 def login_view(request):
     if request.method == 'POST':
@@ -247,4 +247,68 @@ class TenantAssignView(UpdateView):
         response = super().form_valid(form)
         unit_display = form.instance.unit.unit_number if form.instance.unit else "unassigned"
         messages.success(self.request, f"Tenant '{form.instance.name}' assigned to unit '{unit_display}' successfully.")
+        return response
+
+class RentPaymentListView(ListView):
+    model = RentPayment
+    template_name = 'core/rent_payment_list.html'
+    context_object_name = 'payments'
+
+    def get(self, request, *args, **kwargs):
+        if request.user.role != 'admin':
+            messages.error(request, "Access denied: You are not authorized to view this page.")
+            return HttpResponseForbidden("Access denied")
+        return super().get(request, *args, **kwargs)
+
+class RentPaymentCreateView(CreateView):
+    model = RentPayment
+    form_class = RentPaymentForm
+    template_name = 'core/rent_payment_form.html'
+    success_url = reverse_lazy('rent_payment_list')
+
+    def get(self, request, *args, **kwargs):
+        if request.user.role != 'admin':
+            messages.error(request, "Access denied: You are not authorized to view this page.")
+            return HttpResponseForbidden("Access denied")
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, f"Payment for {form.instance.tenant.name} ({form.instance.month}/{form.instance.year}) created successfully.")
+        return response
+
+class RentPaymentUpdateView(UpdateView):
+    model = RentPayment
+    form_class = RentPaymentForm
+    template_name = 'core/rent_payment_form.html'
+    success_url = reverse_lazy('rent_payment_list')
+
+    def get(self, request, *args, **kwargs):
+        if request.user.role != 'admin':
+            messages.error(request, "Access denied: You are not authorized to view this page.")
+            return HttpResponseForbidden("Access denied")
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, f"Payment for {form.instance.tenant.name} ({form.instance.month}/{form.instance.year}) updated successfully.")
+        return response
+
+class RentPaymentDeleteView(DeleteView):
+    model = RentPayment
+    template_name = 'core/rent_payment_confirm_delete.html'
+    success_url = reverse_lazy('rent_payment_list')
+
+    def get(self, request, *args, **kwargs):
+        if request.user.role != 'admin':
+            messages.error(request, "Access denied: You are not authorized to view this page.")
+            return HttpResponseForbidden("Access denied")
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        tenant_name = self.object.tenant.name
+        period = f"{self.object.month}/{self.object.year}"
+        response = super().post(request, *args, **kwargs)
+        messages.success(self.request, f"Payment for {tenant_name} ({period}) deleted successfully.")
         return response
